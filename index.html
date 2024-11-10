@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Milia-Mart Product Catalog</title>
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --text-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --retro-shadow: rgba(0, 0, 0, 0.1);
+            --card-bg: rgba(0, 0, 0, 0.8);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-white: #ffffff;
+            --text-gray: #cccccc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes moveUpDown {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: none; }
+            50% { text-shadow: 0 0 20px rgba(255, 255, 255, 0.8); }
+        }
+
+        .dot {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background: rgba(46, 204, 113, 0.3);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: moveUpDown 3s infinite;
+            box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background-size: 100% 100%;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 2rem;
+            overflow-x: hidden;
+        }
+
+        /* Add retro pattern overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 50% 50%, 
+                    rgba(255, 255, 255, 0.8) 0%, 
+                    rgba(255, 255, 255, 0.5) 100%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 
+                0 4px 30px var(--retro-shadow),
+                inset 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 15px var(--retro-shadow);
+        }
+
+        header h1 {
+            font-size: 3rem;
+            color: var(--text-color);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        header p {
+            color: #666;
+            font-size: 1.1rem;
+            font-style: italic;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            padding: 1rem;
+            position: relative;
+        }
+
+        .product-grid::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(90deg, var(--glass-border) 1px, transparent 1px),
+                linear-gradient(0deg, var(--glass-border) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .product-name {
+            color: var(--text-white);
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .product-description {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .product-price {
+            color: var(--accent-color);
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .product-price::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 2px;
+            background: #2ecc71;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover .product-price::after {
+            transform: translateX(0);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .product-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 1rem;
+            }
+
+            header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Add these new bubble animations */
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0) rotate(0); }
+            50% { transform: translateY(-20px) translateX(10px) rotate(180deg); }
+            100% { transform: translateY(0) translateX(0) rotate(360deg); }
+        }
+
+        @keyframes bubble-size {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .bubble {
+            position: fixed;
+            border-radius: 50%;
+            background: radial-gradient(
+                circle at 30% 30%,
+                rgba(46, 204, 113, 0.2),
+                rgba(46, 204, 113, 0.1)
+            );
+            box-shadow: 
+                inset 0 0 20px rgba(255, 255, 255, 0.1),
+                0 0 15px rgba(46, 204, 113, 0.2);
+            backdrop-filter: blur(5px);
+            z-index: -1;
+            animation: float 20s infinite, bubble-size 10s infinite;
+        }
+
+        /* Enhanced animations */
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            25% { background-position: 100% 50%; }
+            50% { background-position: 50% 100%; }
+            75% { background-position: 50% 0%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(46, 204, 113, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(46, 204, 113, 0.5); }
+        }
+
+        /* Enhanced body background */
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background-size: 100% 100%;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 2rem;
+            overflow-x: hidden;
+        }
+
+        /* Enhanced glassy product cards */
+        .product-card {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.4s ease;
+            box-shadow: 
+                0 8px 32px 0 rgba(0, 0, 0, 0.3),
+                inset 0 0 32px 0 rgba(46, 204, 113, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.1),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 
+                0 15px 45px 0 rgba(0, 0, 0, 0.3),
+                inset 0 0 32px 0 rgba(46, 204, 113, 0.2);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            animation: glowPulse 2s infinite;
+        }
+
+        .product-card:hover::before {
+            left: 100%;
+        }
+
+        /* Sparkle effect */
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            animation: sparkle 1.5s infinite;
+            pointer-events: none;
+        }
+
+        /* Enhanced dots */
+        .dot {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 3s infinite;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Add these new styles for the slider */
+        .product-slider {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .slider-container {
+            display: flex;
+            transition: transform 0.4s ease;
+            height: 100%;
+        }
+
+        .slider-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: none;
+            transition: transform 0.3s ease;
+        }
+
+        .slider-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text-color);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 2px 10px var(--retro-shadow);
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            padding: 10px;
+            cursor: pointer;
+            z-index: 1;
+            transition: all 0.3s ease;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slider-button:hover {
+            background: white;
+            color: var(--accent-color);
+            box-shadow: 0 4px 15px var(--retro-shadow);
+        }
+
+        .prev-button {
+            left: 10px;
+        }
+
+        .next-button {
+            right: 10px;
+        }
+
+        .slider-dots {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 5px;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+        }
+
+        .slider-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .slider-dot.active {
+            background: var(--accent-color);
+            border-color: white;
+        }
+
+        /* Add these new styles */
+        .product-description-section {
+            text-align: center;
+            margin: 2rem auto 4rem;
+            max-width: 800px;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+        }
+
+        .product-categories {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .category {
+            text-align: center;
+            max-width: 300px;
+        }
+
+        .category h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .category p {
+            font-size: 1.2rem;
+        }
+
+        .site-footer {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 3rem 0 1rem;
+            margin-top: 4rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            padding: 0 2rem;
+        }
+
+        .footer-section {
+            margin: 1rem;
+            min-width: 250px;
+        }
+
+        .footer-section h3 {
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: var(--text-color);
+            text-decoration: none;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-links a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        .catalogue-button-container {
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 2rem;
+        }
+
+        .catalogue-button {
+            position: relative;
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            color: #2c3e50;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .catalogue-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            background: linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.2));
+        }
+
+        .button-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .button-glow {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(
+                circle,
+                rgba(255,255,255,0.8) 0%,
+                rgba(255,255,255,0) 70%
+            );
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            animation: rotate 5s linear infinite;
+        }
+
+        .catalogue-button:hover .button-glow {
+            opacity: 0.5;
+        }
+
+        .catalogue-note {
+            margin-top: 1rem;
+            color: #666;
+            font-size: 0.9rem;
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        /* WhatsApp icon styles */
+        .fa-whatsapp {
+            color: #25D366;
+            font-size: 1.4rem;
+        }
+
+        /* Animations */
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Hover effect */
+        .catalogue-button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, 
+                rgba(255,255,255,0.1),
+                rgba(255,255,255,0.2)
+            );
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s ease;
+        }
+
+        .catalogue-button:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .catalogue-button {
+                padding: 1rem 2rem;
+                font-size: 1rem;
+            }
+            
+            .catalogue-button-container {
+                padding: 2rem 1rem;
+            }
+        }
+
+        /* Add this to your styles */
+        .logo-corner {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            padding: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .logo-corner:hover {
+            transform: scale(1.1);
+        }
+
+        .logo-corner img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 50%;
+        }
+
+        /* Update the footer section styles */
+        .footer-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-section {
+            text-align: center;
+        }
+
+        /* Mobile Responsiveness */
+        @media only screen and (max-width: 768px) {
+            /* Container adjustments */
+            .container {
+                padding: 10px;
+                width: 100%;
+            }
+
+            /* Header adjustments */
+            header {
+                padding: 15px 10px;
+            }
+
+            header h1 {
+                font-size: 24px;
+            }
+
+            header p {
+                font-size: 16px;
+            }
+
+            /* Product grid adjustments */
+            .product-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 10px;
+            }
+
+            .product-card {
+                width: 100%;
+                margin: 0 0 20px 0;
+            }
+
+            /* Product slider adjustments */
+            .product-slider {
+                height: 250px;
+            }
+
+            .slider-container img {
+                height: 250px;
+            }
+
+            .slider-button {
+                width: 30px;
+                height: 30px;
+                font-size: 16px;
+            }
+
+            /* Product details adjustments */
+            .product-name {
+                font-size: 18px;
+                margin: 10px 0;
+            }
+
+            .product-description {
+                font-size: 14px;
+                line-height: 1.4;
+            }
+
+            .product-price {
+                font-size: 16px;
+            }
+
+            /* Footer adjustments */
+            .site-footer {
+                padding: 20px 10px;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer-section {
+                margin-bottom: 20px;
+            }
+
+            /* Catalogue button adjustments */
+            .catalogue-button {
+                width: 90%;
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .catalogue-note {
+                font-size: 12px;
+            }
+
+            /* Logo corner adjustments */
+            .logo-corner {
+                width: 60px;
+                height: 60px;
+                top: 10px;
+                right: 10px;
+            }
+
+            .logo-corner img {
+                width: 50px;
+                height: 50px;
+            }
+        }
+
+        /* Additional adjustments for very small screens */
+        @media only screen and (max-width: 320px) {
+            header h1 {
+                font-size: 20px;
+            }
+
+            .product-slider {
+                height: 200px;
+            }
+
+            .slider-container img {
+                height: 200px;
+            }
+
+            .product-name {
+                font-size: 16px;
+            }
+
+            .product-description {
+                font-size: 12px;
+            }
+        }
+
+        /* iOS-specific adjustments */
+        @supports (-webkit-touch-callout: none) {
+            /* Prevent rubber-band scrolling effect */
+            html, body {
+                position: fixed;
+                width: 100%;
+                height: 100%;
+                overflow: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Fix for iOS button styling */
+            .slider-button,
+            .catalogue-button {
+                -webkit-appearance: none;
+                border-radius: 5px;
+            }
+
+            /* Fix for iOS input styling */
+            input, textarea {
+                -webkit-appearance: none;
+                border-radius: 0;
+            }
+        }
+
+        /* Safe area insets for notched iOS devices */
+        @supports (padding: max(0px)) {
+            .container {
+                padding-left: max(10px, env(safe-area-inset-left));
+                padding-right: max(10px, env(safe-area-inset-right));
+                padding-bottom: max(10px, env(safe-area-inset-bottom));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="contact-info">
+        <a href="tel:9810433480">📞 +91 9810433480</a>
+        <a href="mailto:za93548151@gmail.com">📧 za93548151@gmail.com</a>
+    </div>
+
+    <script>
+        // Enhanced dot animation
+        for(let i = 0; i < 50; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'dot';
+            dot.style.left = Math.random() * 100 + 'vw';
+            dot.style.top = Math.random() * 100 + 'vh';
+            dot.style.animationDelay = Math.random() * 2 + 's';
+            dot.style.opacity = Math.random() * 0.5 + 0.5;
+            dot.style.transform = `scale(${Math.random() * 1.5 + 0.5})`;
+            document.body.appendChild(dot);
+        }
+
+        // Add hover sound effect (optional)
+        const cards = document.querySelectorAll('.product-card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                const audio = new Audio('hover.mp3'); // Add your sound file
+                audio.volume = 0.1;
+                audio.play().catch(() => {}); // Catch and ignore autoplay restrictions
+            });
+        });
+
+        // Create bubbles
+        function createBubbles() {
+            const bubbleCount = 15; // Number of bubbles
+            
+            for(let i = 0; i < bubbleCount; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                
+                // Random size between 50px and 200px
+                const size = Math.random() * 150 + 50;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                
+                // Random position
+                bubble.style.left = `${Math.random() * 100}vw`;
+                bubble.style.top = `${Math.random() * 100}vh`;
+                
+                // Random animation delay and duration
+                bubble.style.animationDelay = `${Math.random() * 5}s`;
+                bubble.style.animationDuration = `${Math.random() * 10 + 15}s`;
+                
+                // Random opacity
+                bubble.style.opacity = Math.random() * 0.3 + 0.1;
+                
+                document.body.appendChild(bubble);
+            }
+        }
+
+        // Initialize bubbles
+        createBubbles();
+
+        // Recreate bubbles on window resize (optional)
+        window.addEventListener('resize', () => {
+            // Remove existing bubbles
+            document.querySelectorAll('.bubble').forEach(bubble => bubble.remove());
+            // Create new bubbles
+            createBubbles();
+        });
+
+        // Create sparkles for cards
+        function createSparkles(card) {
+            for(let i = 0; i < 5; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = Math.random() * 100 + '%';
+                sparkle.style.top = Math.random() * 100 + '%';
+                sparkle.style.animationDelay = Math.random() * 2 + 's';
+                card.appendChild(sparkle);
+            }
+        }
+
+        // Enhanced dot creation
+        function createDots() {
+            for(let i = 0; i < 100; i++) { // Increased number of dots
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                dot.style.left = Math.random() * 100 + 'vw';
+                dot.style.top = Math.random() * 100 + 'vh';
+                dot.style.animationDelay = Math.random() * 3 + 's';
+                dot.style.opacity = Math.random() * 0.5 + 0.1;
+                dot.style.transform = `scale(${Math.random() * 2 + 0.5})`;
+                
+                // Randomly vary dot colors
+                const colors = ['rgba(0, 0, 0, 0.4)', 'rgba(46, 204, 113, 0.3)', 'rgba(52, 152, 219, 0.3)'];
+                dot.style.background = colors[Math.floor(Math.random() * colors.length)];
+                
+                document.body.appendChild(dot);
+            }
+        }
+
+        // Initialize effects
+        document.addEventListener('DOMContentLoaded', () => {
+            createDots();
+            
+            // Add sparkles to all product cards
+            document.querySelectorAll('.product-card').forEach(card => {
+                createSparkles(card);
+            });
+        });
+
+        // Recreate effects on window resize
+        window.addEventListener('resize', () => {
+            document.querySelectorAll('.dot').forEach(dot => dot.remove());
+            createDots();
+        });
+
+        class ProductSlider {
+            constructor(sliderElement) {
+                this.slider = sliderElement;
+                this.container = this.slider.querySelector('.slider-container');
+                this.slides = this.container.querySelectorAll('.slider-image');
+                this.prevButton = this.slider.querySelector('.prev-button');
+                this.nextButton = this.slider.querySelector('.next-button');
+                this.dotsContainer = this.slider.querySelector('.slider-dots');
+                
+                this.currentSlide = 0;
+                this.slidesCount = this.slides.length;
+                
+                this.init();
+            }
+
+            init() {
+                // Create dots
+                this.slides.forEach((_, index) => {
+                    const dot = document.createElement('div');
+                    dot.className = `slider-dot ${index === 0 ? 'active' : ''}`;
+                    dot.addEventListener('click', () => this.goToSlide(index));
+                    this.dotsContainer.appendChild(dot);
+                });
+
+                // Add button listeners
+                this.prevButton.addEventListener('click', () => this.prevSlide());
+                this.nextButton.addEventListener('click', () => this.nextSlide());
+
+                // Add touch support
+                let touchStartX = 0;
+                let touchEndX = 0;
+
+                this.slider.addEventListener('touchstart', e => {
+                    touchStartX = e.changedTouches[0].screenX;
+                });
+
+                this.slider.addEventListener('touchend', e => {
+                    touchEndX = e.changedTouches[0].screenX;
+                    if (touchStartX - touchEndX > 50) this.nextSlide();
+                    if (touchStartX - touchEndX < -50) this.prevSlide();
+                });
+            }
+
+            updateSlider() {
+                this.container.style.transform = `translateX(-${this.currentSlide * 100}%)`;
+                
+                // Update dots
+                const dots = this.dotsContainer.querySelectorAll('.slider-dot');
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === this.currentSlide);
+                });
+            }
+
+            nextSlide() {
+                this.currentSlide = (this.currentSlide + 1) % this.slidesCount;
+                this.updateSlider();
+            }
+
+            prevSlide() {
+                this.currentSlide = (this.currentSlide - 1 + this.slidesCount) % this.slidesCount;
+                this.updateSlider();
+            }
+
+            goToSlide(index) {
+                this.currentSlide = index;
+                this.updateSlider();
+            }
+        }
+
+        // Initialize sliders for all product cards
+        document.addEventListener('DOMContentLoaded', () => {
+            const sliders = document.querySelectorAll('.product-slider');
+            sliders.forEach(slider => new ProductSlider(slider));
+        });
+    </script>
+
+    <div class="container">
+        <header>
+            <h1>Milia-Mart</h1>
+            <p>Discover Our Premium Collection</p>
+        </header>
+
+        <div class="product-description-section">
+            <h2>Premium Travel Accessories</h2>
+            <p>Welcome to Milia-Mart, your go-to destination for stylish travel essentials and accessories. Each product is carefully selected from premium brands to enhance your college life and travel adventures.</p>
+        </div>
+
+       
+        <div class="product-grid">
+            <!-- Product Card 1 -->
+            <div class="product-card">
+                <div class="product-slider">
+                    <button class="slider-button prev-button">←</button>
+                    <button class="slider-button next-button">→</button>
+                    <div class="slider-container">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxm07nDjrfj8v9M-s4kXmKM22vnlZ_O4FEUQ&s" alt="Black Tumi Box " class="slider-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQR2ShGVALk9XmJt5Mh_HjeCY_WDaAwDHkw8Q&s" alt="Black Tumi Box " class="slider-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTYITsoDsfxbUS0gPnE0AQ2JD3PRrIa9xDvyg&s" alt="Black Tumi Box " class="slider-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRj5H7bBxp64DRWCrMDrRAqW9LPfq3tJEnImA&s" alt="Black Tumi Box " class="slider-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTAFIhNkgQJkC625a-23QDqmgyi933wRxWEKg&s" alt="Black Tumi Box " class="slider-image">
+                    </div>
+                    <div class="slider-dots"></div>
+                </div>
+                <h2 class="product-name">Tumi Storage Box</h2>
+                <p class="product-description">The Tumi Storage Box is a sleek, durable solution for organizing essentials at home or on the go. Made with Tumi's signature quality and attention to detail, it combines style with functionality for versatile, refined storage.</p>
+                <div class="product-price">₹200</div>
+            </div>
+
+            <!-- Product Card 2 -->
+            <div class="product-card">
+                <div class="product-slider">
+                    <button class="slider-button prev-button">←</button>
+                    <button class="slider-button next-button">→</button>
+                    <div class="slider-container">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQU6K4IZUOAo-iL_xnsVMwr3lPC9PaTu0OhMQ&s" alt="Portable Charger View 3" class="slider-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEmqvWXjbBXpDok-NZK_8i6iJzio9Nx4VxmQ&s" alt="Portable Charger View 3" class="slider-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTSr3nNmrWClbxV_GDAmUoOS61fqtYW-Z1cnQ&s" alt="Portable Charger View 3" class="slider-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEmqvWXjbBXpDok-NZK_8i6iJzio9Nx4VxmQ&s" alt="Portable Charger View 4" class="slider-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1M7r0lOuSD6RarsHjHGp0Nx8Cf_LSseHVfg&s" alt="Portable Charger View 5" class="slider-image">
+                    </div>
+                    <div class="slider-dots"></div>
+                </div>
+                <h2 class="product-name">shinola leather bags</h2>
+                <p class="product-description">Shinola leather bags combine timeless craftsmanship with modern functionality, offering durable, premium leather designs perfect for everyday use. Each bag reflects Shinola's dedication to quality and refined style.</p>
+                <div class="product-price">₹200</div>
+            </div>
+
+            <!-- Product Card 3 -->
+            <div class="product-card">
+                <div class="product-slider">
+                    <button class="slider-button prev-button">←</button>
+                    <button class="slider-button next-button">→</button>
+                    <div class="slider-container">
+                        <img src="https://i.ebayimg.com/images/g/jagAAOSweo1lGwkw/s-l400.jpg" alt="Gaming Mouse View 1" class="slider-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2BLXFRz5v8Lt2L77YY1xIxjwkIeDnR4ZcVNDiykXEMENEYjCO3aQ5YWZZe4mEOy-uKQM&usqp=CAU" alt="Gaming Mouse View 2" class="slider-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxF5_O3FtVAnoIt8YxA75pRk1uqaHqr5edr_pHrxONbBh2i5qNU5QicbYcnFSzSV-jvWk&usqp=CAU" alt="Gaming Mouse View 3" class="slider-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRS6HJ0BW0ygWOCd056cYBpcy6Fy31fkR8Mz6XeQ1bcHc6a86il-1h1JOKMhgiojKrqHec&usqp=CAU" alt="Gaming Mouse View 4" class="slider-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLEDPw_zonIJrmlMYCU2hvP-HvM--gE6DmsTYKGRJXkqzZJv6SwiaGU5zjpdhe5fnvRsg&usqp=CAU" alt="Gaming Mouse View 5" class="slider-image">
+                    </div>
+                    <div class="slider-dots"></div>
+                </div>
+                <h2 class="product-name">Aqua di parma jute pouches</h2>
+                <p class="product-description">Aqua di Parma jute pouches are elegant, eco-friendly travel accessories crafted from natural jute, embodying Italian sophistication with a minimalist design. Ideal for holding fragrances or personal items, these pouches add a touch of luxury to any journey.</p>
+                <div class="product-price">₹150</div>
+            </div>
+
+            <!-- Product Card 4 -->
+            <div class="product-card">
+                <div class="product-slider">
+                    <button class="slider-button prev-button">←</button>
+                    <button class="slider-button next-button">→</button>
+                    <div class="slider-container">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWH9aXKV0VWhDCLhXiebcOTAPHBFwo9xx9kJICoUtSx1rQodUGv9gFLDi8eRrSiloi_Q8&usqp=CAU" alt="Wireless Earbuds View 1" class="slider-image">
+                        <img src="https://i.ebayimg.com/images/g/nIcAAOSw8SxlwQ0X/s-l1600.webp" alt="Wireless Earbuds View 2" class="slider-image">
+                        <img src="https://i.ebayimg.com/images/g/KEQAAOSwIzRlwQ0Z/s-l1600.webp" alt="Wireless Earbuds View 3" class="slider-image">
+                        <img src="https://i.ebayimg.com/images/g/gAgAAOSwOsJlwQ0a/s-l960.webp" alt="Wireless Earbuds View 4" class="slider-image">
+                        <img src="https://i.ebayimg.com/images/g/WlsAAOSwLRhma4bV/s-l960.webp" alt="Wireless Earbuds View 5" class="slider-image">
+                    </div>
+                    <div class="slider-dots"></div>
+                </div>
+                <h2 class="product-name">SALVATORE FERRAGAMO</h2>
+                <p class="product-description">Salvatore Ferragamo is an iconic Italian luxury brand known for its exquisite craftsmanship and timeless designs in footwear, leather goods, and ready-to-wear fashion. Celebrated for innovation and elegance, Ferragamo combines high-quality materials with sophisticated Italian style, making it a favorite among discerning customers worldwide.</p>
+                <div class="product-price">₹150</div>
+            </div>
+
+            <!-- Product Card 5 -->
+            <div class="product-card">
+                <div class="product-slider">
+                    <button class="slider-button prev-button">←</button>
+                    <button class="slider-button next-button">→</button>
+                    <div class="slider-container">
+                       
+                       
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQryjJpQEysjoME5wJkoAQ_oUhPvCvH9b-sso_5ijEpPeEKDxZxLzwG6DRWcQ12N5TslvI&usqp=CAU" alt="Portable Charger View 4" class="slider-image">
+                          <img src="https://i.ebayimg.com/images/g/T4kAAOSwY8Bkj4Te/s-l400.jpg" alt="Portable Charger View 4" class="slider-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDPQml9tbzdphLIkjccjgB1kYT9TVKbmgLYgPRbhUrP8_fNEt9-0iVSYf4CPQXd0biCRU&usqp=CAU" alt="Portable Charger View 5" class="slider-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQB_Nmg5yPOe9FXSHCPlGpLU_rXjNZ2tQWlhVZOBqhSPuMg09Y6UO0rjIZz_2WmFlKpz3E&usqp=CAU" alt="Portable Charger View 6" class="slider-image">
+                    </div>
+                    <div class="slider-dots"></div>
+                </div>
+                <h2 class="product-name">Premiuim KLM pouches</h2>
+                <p class="product-description">KLM Premium pouches are stylish and functional travel kits, offering travelers a curated selection of high-quality skincare products and essentials. With sleek, modern designs inspired by Dutch craftsmanship, these pouches enhance the travel experience with a touch of luxury.</p>
+                <div class="product-price">₹200</div>
+            </div>
+
+            <!-- Product Card 6 -->
+            <div class="product-card">
+                <div class="product-slider">
+                    <button class="slider-button prev-button">←</button>
+                    <button class="slider-button next-button">→</button>
+                    <div class="slider-container">
+                     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSdc-Ldnr2U8ic15N9OTnh-pURmP5yK-qF_Q&s" alt="Smart Watch View 2" class="slider-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTs4pfRr0l0JEfevFh0d31AdVclGRbrRksEWQ&s" alt="Smart Watch View 3" class="slider-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-1t2mOoFkdKV-q474la4RceIg1VWYZxgRoA&s" alt="Smart Watch View 4" class="slider-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGVDTuq4QA40xhx-QP7ArfAZJiQ6obh9EKgA&s" alt="Smart Watch View 5" class="slider-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSdc-Ldnr2U8ic15N9OTnh-pURmP5yK-qF_Q&s" alt="Smart Watch View 2" class="slider-image">
+                  
+                    </div>
+                    <div class="slider-dots"></div>
+                </div>
+                <h2 class="product-name">Bamford</h2>
+                <p class="product-description">Bamford is a British luxury brand celebrated for its commitment to sustainability, offering a range of wellness products, organic skincare, and handcrafted clothing. Known for its minimalist aesthetic and eco-conscious approach, Bamford emphasizes natural materials and timeless design for a refined, holistic lifestyle.</p>
+                <div class="product-price">₹150</div>
+            </div>
+
+            <!-- Product Card 7 -->
+            <div class="product-card">
+                <div class="product-slider">
+                    <button class="slider-button prev-button">←</button>
+                    <button class="slider-button next-button">→</button>
+                    <div class="slider-container">
+                        <img src="https://www.picclickimg.com/HlsAAOSwU3JlG6Ul/Emirates-Fly-With-Me-Kids-Airline-Small-Duffle.webp" alt="Amenity Kit 1" class="slider-image">
+                        <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxMTEhUSEhIWFRUVGBgVFxgWFRgXGBcYFRYWFxcXGRYYHyggGholGxgYITEiJSkrLi4uGB8zODMsNygtLisBCgoKDg0OGxAQGy0lICUtNTAtLzAtLS01LS01LS0tLS8vLy0tLS0vLS0vLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLf/AABEIALEBHAMBIgACEQEDEQH/xAAbAAABBQEBAAAAAAAAAAAAAAAFAQIDBAYAB//EAEMQAAECAwYCBwUECQQCAwAAAAECEQADIQQFEjFBUSJhBhMycYGRoUJSwdHwI2KSsQcUFkNTcoLh8RUzorLS4mOTwv/EABoBAAMBAQEBAAAAAAAAAAAAAAADBAIBBQb/xAAvEQACAgEEAAQDCQADAAAAAAAAAQIRAwQSITETMkFRImFxBRQzQoGRobHwI9Hx/9oADAMBAAIRAxEAPwCiOglm9+b+JP8A4xJ+w1m96b+If+ME12lZNCwiaVMWfa9I4bsDDoJZd5v4x8oeOhFm3mH+sfKDoCve9IdhV73pHLABDoPZf/kybt/2h46D2X7/AOP+0HAhXvekPCFe96QHQJ+xNl2Xr7bZ+EcOhFk2X+MwdCFe/wCkdgV7/pAFgf8AYyy7L37Z1h46G2T3VfjMFTLX7/pCiWv3/SAAaOh9l91WTdsxx6H2X3V//Yr5wT6tfvnyEd1a/fPkIDgMPRCy+4r8avnCfsnZfcV+NXzglMQrColZoO7UaiA0q2TVEhKiRWpyDFmcDN4bHHKUdyET1EIT2Msp6L2UZIV+NXzjb9ELPJkyBKlEAkqWU4nVVTOXroIwxnqGaiWz2b6+EG7ttqZcxM1PEGwqAZyCO/do14EqtiXrYuVLo285KVAhQBBoQQCD3g5xk726CWOa5QgyVbyiyfwZeTREOnFWNnVXIYmUf6VAGCtgvUTqhExBcBpiSk120IiR5Eel4MkrJr0u2VMSUzZSJgAYBaX5UOY8Iw999CrIS0qeuSs1wVmJ8jxAeMejTUYgQ7O/rGJvC7phUFKQOFWNRqapLkBgTp2T7z1ju1SlFVdvn5GPvufTpvHKv6/Ywlv6KWlDkIE4DWW5LfyEBTdwMAuvUklORyIIYjwOUemKWtASUlXGsqD0OEUSRSgog+NYKzOqtEtJnyUTCUg8SQTlmHq3dG82l8N3Fl2m+23mjtzQT+n/AEVOg13ImWJMyYlzMWtQqRQKwDL+WCp6PSCRwkbsowVuuyIlSZcuWnChKQyaln4iK1zMJNcGKsTkopWeFqVCeSUkuGwQno/IB7JPeoxakWGUjsS0jm1fOJzHCGNv3EqEV0hVZQPnItvD1KZJD1M8mqasAZZ7sxkIvqhAYXOG5djseRQlbV/UIofCMQApUOCAdnLxHOlIUGUEEbHCfTDEc20OkJFAM4ieFeFfbGPMr4QEvropYFJUo2eWCATwJwaZulow6Ojtm1lg+KvnG+6RT8MlX3mHxPoDGKn8QS5IckljyhyxXB+5PLUNZFzwV/2csn8EfiV84VPRmyfwR+JXzirOCgogLVm314xobBcywl5kwg5sA5HeYkSbdIvnkjBKUn2DB0Wsn8H/AJr+cO/ZGx/wf+a/nBRUhSKpVjSMwQygN+YiVEwNBJOPDOwyRmriwfjY1ETyJo+hEgiRMB0emcN/Qw8TR9Aw1MSpjgCpmD6Bh4mD6EIIeIAOEwfQML1g+gYR4UGA6d1g+gYcJg+hCQ0qgOEnWD6EMXOAitNtNDhNQHz20iayXXMmEKPCHBdWxGQTmfGkURwN8y4I8mrS+HGrZUm210lhShNcwDvE1nueYtqBCRQOGpyT84O2O7JctmDkanPem0WVGKItRVRI3jc5bpvkFSbnlpqXWd1ZeUdaZaUF24SGYDu9cvIxfJivbpWJBGukauwlFJcIwXSS8Z0ibhBBlrqg4lA1zGbULeYjrrvyYc1LoWIJSoA57Re6VWMTJBWAHl8ddA3F3b+EZe5pSyaJ3dlUJ5UqGGeUD2rsxDe1wei2bpGunGS+6f7xMu+CuuIORmCzjRwQxgDZ7FN0S/Dn+ddTDZsooclJZjXJudco2o430YlkzLh2aCSZamxpxMGAGEJbYhGYpvE9tUFCgbarEdzxkgspypRvOLMu2KDMosxJr8ozkwKXJvFrJQ4SRsxfyON5U1KUaqSniDHsgKc5bbQAtP6Q7OklPVTvEIS/gVP5xQl3ksbHy+FYlXeCVBpkvEO4K12U8Jlgn6Mrxa7Bf/JBv6MuSenljV2jMR/Mh/8AoVQbu+8pM4PJmpXuAajvSajxjFzrusMzOWlJ5YkV/pPwisnotLChMs8+ZLWmqSkpU3mxP08Y2Zo9pMqeXQZF8LlF/PlfxyejKEMwxnjeFpRh7EwOywp0FqVQrDh34S/80GJVuBjat+hJJJdNP6FvDHNDUWgGH4hAcMt0wn1QjxPjQegMZqfMqgbqI/DhB9Xgz0lVitLbYR6P8TGeM9hLLOVEqA1JUtTNzMPXEURSdzZd6K2XrZ8ycpimWotzWSW8hXyjXT5rJI3z7oHdHrt/VbMiWrt1XMP31VI7hl4Qs6YVlkgxPCO1UPy5N8m/0Q+zHjA3oYGpi2u0JQCEnEs0JGSd2Op/KIJcukJzyTdIs0eOUYtv1OBh6YiESJMJLSZJiVJiBJhxUACSQAKknId5gONpK2WAqBt534iU4AxKyoeEHZ9TyHi0D70vihSlwPJa+/3E8hU67QBmLLg4cSzRCAPgMgIZGKEym6vpf2H09JDkpAxasS1cvRovWW9Sr2YAXfcyxxzjsSkMVFzmTkP7xqbtu1ZdKEAJOJL1GeRxasdto2sLfL4QqWqjH4VyyT9ZNKZlvR4mslgmzWVkmhc5Ag6anwYQWsF0IQA/GQ2fZDahO/MvBJ4alGPlJ5b8nnfHsU7HdcuXVsSqlyBR82GQi6YR4s2OUkl1EbNqY5KXqxkIeiKiojwvlBC3hAoKEfHeILJaMBLvUQKVq0gcUpU2VZ9nUnMNELRftlrKqCg1EUwI3FuuTE0r4AVvlYVkHsq31fMfW8Z+w2IS5ikDIdnVknLvTpyjYXtIxIcZpr4QFmgEBYzFHyod6Oz6c41NXERjezJXowrYVAJJ/I/H4CBi5YmTQrHwhiCAUuUrSFYFpLKTklSVN2iWOUMvG2dUEgEAghgpeDI4lBNC9A4BDEODD7jsyF4FoIyOFWHq+E9sYeyymluEpS5D7AYgqVlE3YX/ANNQ6UlKeFOLkHLMxzGdc6QHm3U9qRLNErPCzAFIQoqGbmYCH0GE8o0cgKIJSQVEsDhchKWHLOteeusUiYFTBUcJclTFsQypV+WoMZeWUXSCOGMo2zGWtKkzcADgKWyQHWpOJgpIfJOSnqwcO9K/6wQWWkprhWQoFCVFiE4lYcWJ6YQY9Lw4TxEkklnGQ0Br9coT9VTnhD7kVzfM51hS1GRDp6bBL8tfRnnCZ6eFJWxmPhTMSUKIGbJUAQQOWUTAEjEkA1FUnMAUNNPnG5m2GWpzhSSSHLAuRlWBtuuxBSSoYQlyCBUUqQAM8w1YbHVv1RNLQx/KzO/rSk9lRZgM3Yn8++LBtygS4SptWY+e8URdxROTLC1qR2gCcRGIHhnLWVKLkEpKW7Jd4uzrFkA+uQYqrkBuOeenNn3nHVsnyaWcHRKm8mDkKADChfPkp4sovT73mCPyf8oDzpCgKmnaUX4QA/Fiap3AqIimKejVLBtQH4VcLsg+8WECzYpdMztyRLlpsZXMKxMqasWOgG4PpDrhutMtYmTiCpCQmWACANyxY4qxXA4VAUJLPsRmIuoUQkMS7h3DDyhj6OJ8li97YEpKyCr3ZaSApZ7yWA5mMLeNpts+iymQh2wJPk5T2tMzGuvBsJxANWjYhQP2T8G74zVgzlJahCpmuqjh7RJFGpWM7Rikkgpd8opSEkklg5Pd9esXgqBN32nHOtFeyoJ8Ehj/AMnPjBVIiLMqmz1NK7xI4Q8GBM+/JCM1udkhzFC0dIFr4ZKSnnmrw0H5xnY/UY8q/LyaG1W5Ertmvujtf+o5n1gFa7yXOIADAdlIyTz+8r7x8GiOyXUtRBmHC5atVEncfExoLruwkfZoZx2joQpu18BDY439CaeeKfPL9l0C7JdBNVliXI3JAfw8Y0N13USPs0YQWJUdRhYjFme4UrBeyXShJdXEXJ+7WmWvjBRMNVRVIRJSyO5/sD7Hc0tDOMRG+Xgn5vBMCEhY422bUUuh0RyZ6VKUhJdSCAoD2SRiAPNiC3Mbw9POCciVLkoCUhgK5upzqSakxiU6GQhu7KsrqkSylKQCXJYDtHMmIAYVZDlstIbHYqjkpOT5OUYaRA++78k2VIVNVU9lIqpTbD4lhGDvL9IFoWWkITLGjjGs/DwY98clljHsr032bqNSrguPd8I9JUIaI8rtPSm1qCcU1lpLuh0insqSDhV5fGPSbqtonyZc5OS0gtsclDwIIjuPMp8I7rvsvNpIRnOmn7ehaXACZLwLKdMxGhaB972d04hmn8ofFnkZI2rRlb3lBToJUMThLYWCgMSWUpJ48ykuOzvSDt1ghBOMqUQEBSgFLJHCSpIZjvllAK9rJiKZgSlQPAsKQglgFFCgSHcKYAfe0grYZfGkOCBxKzAdsKQHzIY61jkuEahLckGVzAhIThoBhcAhLkVB+cLZUh6ZkkmlXpnk1KOdDA21qKwEAUBwqxdkg9okHMEBtaq7yHWaaSrHLSQkDCxo7OACk+nfE907LZQ+DanQflTQWDd2vmdxvEpX9a98CLNa3NagEVBYM7OX1GRAMFSGhWTa3aOY1JKpHYn+m89WirOszlWIgoUMJSQ+dD4NFv6/xyinNU5+jBCG4J5NgHs9zS5S8SSogApQCwShJY4QAwIp2i55w5Uk1oTvzb3lDWLkxX19aQkhdD3/AEI7mwR2pk/iOcrYHtKMqF80sni75aNFbvnD7HYQxKgNzV01q6le0kmrZAmjReKsRLmmw5ak7jaGyncbd1O9KdUncxvBp9nLJ8mS+EchOpFBk4qWc4Qn2W0MZ+857krllkiiSHCCpbMAxAmrWCyWcJUOcFb0ngnqwDQgrqQ2GvEsVdNFBAIJHlAe0pJSwxEqoyGSpSCCSlBFJMpXbSoqBdJGsVGYd8lG0zZipKkKLunDjUySApwgrICUhSiCnq0gkKDE1ivYSnGKKT9mlLFLFISC77RcUpgFOk5spIOElQBPVpoTjb/cUThWk5Gppz5ZKJ2E16tSQXepGF++sdTpcg1udL1KNzzcNpmP+8r+Kr+f5xq0xh7HO/2Jnck96c/yjcS8ol1C6Z6GjdboszVkuxAzSBUUAD11JyEHbuutShwICQxGLIciFZnwEHLFdEtDUxENVXLYZCCaUwxbV0Je+fmZQsVzoTVXEaZ5ONW18YLIGkRpEPEDdmlFLokEPBiMQ4GOHR7wrwwRTve9JdmlKnTSyU7ZqJySkakwArZfKwA5LAVrtGWvf9INjkkhKlT1D+EAR+MkJ8njzrpB0nnW2ZhWookvSWk0bdZ9pXfQaRVvuwSpahgVQ+jMG3L5vCnk5pFcNPxcjap/Sqh62RWHcTQT+EpA9Y1ir8E2xKtVlIPCSMdAkpLLxD7rHlTaPEZMhJIxJIQc6gKI+6DR+ZpHt/RiVZ/1SWiz1klJHFmXJx4/vO7/ACjsW3asJQhjcZVxf7nn14WVdoK7Qsvmw60KDIAdKSE6Pk41gfZ7MuYSmVLdg5CASWcDmTUikbe1dCT1suXLm4ZC83PECHJSw7RwpoTsdmjYXBccmzIIkhyqpUS5Uzs6tuQ5x5zUk3uPr39pYceNPGr9l7Iw9g/R4VS0GbOVLmKdSkBAUyfdd+1UfIs8Xehc8gzZCSpcqWUlClJwkFYJVLI3B07943FpQFApcjcpLEeMUp81zyEU6ZPfZ4X2hr5ZcLjk5vr5f7oQQ1YcNDhDVR6B88ZybJAUUKqOe2YhbI4JxZqUTQgqZIAcUoafTRevaTksaUMUerSoOrTXajPzLUbVoMvMbQrF8OShptDBSgkEJZgCMyQyWyLgjzgpZVvi8uZ37u/kIHWmSPaAIfEBhZ9Qa5BxQ7w+6rWkp7XaJIzDtT8QAfwMIw8PkflTovzdDq4qA50c9xasXrNawzKLMwd35DxgVap4ZJxUzcEM5oH3BxRCudl4tnz4W8mJhOolU+CzS4t2PkN2m0pAIBqaUz89c4rhVH9X2zihJU5bcs+tBqdFA0iazr4NN3ApUCoEb07ditVBJV7EVomfTP5DYw2UXoctn9FK32iFBcknuZ9/eOWE6QqhWmQ5bbDVQ3MWUjy5y9ESMX9cttUp1I1eL8mVuN3/AM6A7RFZUEmor6ltSdC2kWbVPEtOjmgHPTzZomy5udsR+HFxukZ+8E/aB9wU6mgzlS6vMS9VEdnugTbGwqBwsFJBS7gFusYrqZq/3qEpAq43gnaVEzCcsipjXCkDiWugSUkVQC5B8YFTjwpAeqmQEJqaKURZ00SkfvETVE6ipzovgwl8RFaSXqXUWBLcRSqrqBfqpKhxBAZlBoSxh0r5sPzMNtRoGIKRiPCT1YKg7g06zETicBkkKAzES2IcA5k+gEGR1BmsCvLFGVVJwmbL/hrxp7lV/N42FgnYpaTygDekprQDpMQUnvTUejxbuy0YEYc2JEKS8SCKJy8HK2j0UJhwTCvDhGbGUIBCx0MnKYf3Y+B7o7Zyitbr1lSmxqFdA5U27DnSrRDYb+kzFYQpjXtDDrRsx6xhZs0zFGYouVFz9ekKGiZ55WLcqPT3jzH9KBnzLTLlBCzLSgKSySQVqJCi4o4AA5eMGLktv2gMxRJSkplOeEE7+BLeWzErXNCWXMUeJSUjclRYMNd/CE59ZtqKXLLtNjjL4k//AE8nRZ1PhAYu2WJROwSMzHoHQzoIHE61op7MtZrXIrGQ5J89oMdELrRIE95WM9bhQpgpakKCa/dS5IbkY1y1cn/KMSzuS4PQjiS5A1/9GrNaEuuWQZaWSZTJUAHOEaKGwIpXeGdGrrl2aUZcpSyCrGQsgqSSAGYANlBS0zCEqL6Fu9qRlJU5aVBaTXPv74zDP4clfQnVr4NprLunkYjm6jnyoItomOMIAGw0gRIQVJxJmEBVcgSNw58vCJ0SWzUpR5n5Rbs3R6/UR4qjK9/HtTLxGQZuUUZk4FahzLc2NWipabyWnEnFlnR6bu2zecUrHaHJQSB7SSdFeOf9ucIwZNs6LdRpt+Lc/qGkmFgaq8wAKOW8B4xUm2tSszTYUEeg8i9DxPBldMJWu0oAIJfkIComkGhI5698ODawxaaEsWH0Q/mfGCGS3TMZ8NR3LtDLwnnq1cLAAUBfiVmMWvKucB7umtLB3dRIOYd8b6EHMa1iz0hmNKdi1XYl8iabFg/hFKQUhA4mZi4S4GmMB3J0IbbKFSVMdjkpxsvLWopISz0A4QRUk4UinApqKJoTprfu2WQgJViyIZRdX8q17jlygbIJANMyc1VrTCpRdkKzH0YJSFhs3FQNMtG1UIlnJvg9GCqKJTMwMebuB90glIzKqsfHvh8q1FLihLB30LDiJ0T4Qiw2FTPxOebBnNaDQjb0SzFAUMdEPVqJBV/2SYZiurJtQ020RqcDFSqinDVgQASkO2Jzkd4ms8xWNAY8TdoHEUktVqJKc9XEXJKZMxISJhDFQY8JBoGYjFkA2RyidNgSVJUFuBhYOC5RkSp8+cPc5nnPCt1ojsNvxFsKWDkqBYMA4KXFecVrwmlUxTMfZpQndKlewC7g7iHKu9UsKUDiKhhBALhRUHAeiU0FA7VimizKCQDLYAdkg4Q2aTqs0oWhcY+pqV7eStNWHcFgCSFYXAKeHEiXVUyYl8Kn08DAy2BgxxCqisYiWwlKiJk1LqUpJ40ISQ6QRoRF+ZMNSSQcOJ1MFYaALVi4ZKBVK0sSRvA+2EJ6sDhYEoA9nAWPUpX/AA9ZpSSZai2UV1SELsq208RBzACdARiLlISkkIlkAKCX9s7wxN5oTMTJVQ4Qp+aiqnkBEczUMAArCwdk4QOHEqqwDiZWtIG3xYguaTkrhCTocKQK7HnBlcVH4jeCM3O4doK9IE8CZg/dqCvDI+kQrBegcGuZ+EMsloK0KkTKKYprvzhl2LPVhKiUqQSgh27OR8mjOOLjwMzZFOpevTPVGhZrgAirkDzjlQhS7OaDTnCLKWhxhoWMn5ej+NIr2ua1PrIitaiuR2gdaraZaCsqLJBJ7hE2XWQhLbVjsemlNcGRnIwqUj3SU+RaGJFYu3xJUZiZ8shcmakLcM6FHtJUBUHED5iKZMLTT6JdRglhltl2KS2UW76tRXZRNFVWeZLmqG4QoOfwknwikDFyxrMtYTMSQiYllBQoUq1rmnP1heSN8+x3TZdkvkzRoAIC0lwoBQIyY1B8orTOl8izqwKmGZqtMsFZQBmotQAah3gajoogDAbRPVKD4ZXWMgA+zSpEEpV2SES1S0S0pQoFJCQA4IYucyW3iKLhF3d/weunIZe/Tqzy8RlTETkmQoyil8QnuQlExJ7IZjUPnyjFdFrYZfVoxky1kylAl8E0DEnDslaaNukxnJ8ky5ipSu0glL5OUmhbwHnC3dPU5QmqllJS1T1iFBSCG1NU/wBcenLGnGkKyNz7Pbbins6D/MPj8IKzJoAclhGWs8xSSFOxHpEq5pUXUfEn69Ibp5SjjqRDLFbGdJps1ZQbMtiFAEFsJG9e+LOEHnlyJ+vlFUTK+LfTx0m1g4kkHgVh2cEOD5EV5QnKnuPf0mRSwKL/AC/0SzyxalA1NeffDwCwdkjnr8TFRExaQApQUpu0AASHLHkWzI1fKKEq8kTzMly5vEBVQ0xAsoHXKKYW0eVmglkaXXuEbxvGXIQVqc6BxqxIDB2yzLwsq1iYlCxUKAVXY5jyeAFz2Kclcw2hSVpUCAHxAurESxFBy5wZxBgMgNBsI0u+DOojjhFxTt+/pVFe85YXKmIOjKB1BQoKcc6esDSSGctRwW8MaQaBByVSkWLbasKFrJIejiprQkbsHPgYEJtiX7QDEAk0QFLZipVAqWt9MifN2Zcnn6Tyv6haUCcCQhgnMPwJb2FEsVA0KS1G8icqeGJ4icP9Zw7aBQ9X2gHKtZS2FGJ+AAiu5lMzANVJO1NoI/rwlJxEEpFVKHawgPiJq6ktUDPnWInA9VZG6X+/3+7CabQFJSoEaKKgSwdI4qdoOWb/ABCLnqB5vkWJcucOrJOYMUrPeKSHLguGo9CKLSkO0s88vSJFqzFKUIegeuFasy+Yb/DlHaqJcluVsHi1OTUKS5DZJ4X4VKqpc9LGgoRlzlRPJIUFGoCsQHGRRlol+wmjKDaeUdqkqJcAqfKgxlv4aFEJTNSTnr35zyZICS7OTjUUqLOXGNSqO+SkijvBYzJHHsTXZZs1sWlJIXhIViqo4ErIFVLzUlT6b+c6L2nYBLxLVixM6ftVO5UhLYQggHhUcw1CaRRE5KaOBkAMwMRolKB7CtFHLcZxUmWuWCQojiOFQxMThUOCbNDnGk1ABryyLIK3bI8j4pdsvOMD8DFWLEHMsEukLUzdcouELS5D1qHalbVcSq4QkMoqc4QjWepLAYFEjqgo4kLBIpFgWquMEKUOwWGJ1AAdWji6uWQMMxSmbtbiKMtVQxZjwkDrCkoJQShJxKmzEVlrmFhhIIyEPbTJVCUfMqK0z2QyhU0WwUkAsEsmgTQANoExHebkqaUssTUYdD3xLIS65QYij4SrEQ5JYrPa2flBNSXhWp8qRRofPJgOsxIaWsTE/wAtRsa+vzMSS5qFD7RDqFCajLfnFwJwzAYntlzomKx4il82CS53qIxhy7VT6G6nT73uj2bdFnMsMVFRNa6ZOz6CIRbkgkYk5hqtSjufOOtNr6xAbXPwb0NPKA9pl7R5q1VcQLMkG3bL1oU6ief5QwTCkukgK0JTiAejlOo5OIpWaeRQ5RMmcDrWIZXuspxu0qFtcoAEOhQz+zldUgnMshz/AHjOW+z9Wph2TVJ+Ebe4LvE0law6AWA3Or8g8B+lFgJtBkypbhkqSEvQtXw+cPxbl8T9RWpx+LfuZVRoY3HTuyp/V7Ov2kgJ70lDkeBA9YDf6RIs+FVvmhBV2ZKS61d5GW1POD9qIW1ptuGz2aWOBC1MSKVW+T0pmcmGtfPoQQwzUXa76M7dVtxJY1Uj8tDBBc0a5xn7DgxGdJUvq1lXV4kFJVLxEJJCqkFnB/xFo2kav9c4S9HulfSKsWVqFS7Mx+kOwAEWlAoWRM78kq//AD4JjOW661ypMq0pmBQWQXS/Ac01OrgjkQ1Y9BtEsTUKQoOlQKVbMeekZS5wEKnXdaOJKnMpWTvVw4/qHMKi6MFFUg3N8mwue8evky5gFVJBIGihRQ8CDFxUwDMvySfjl5PGH6IWtUrrbJMNUKxJD0L5keQP9UEr1vYym4CoHXTOo72jVHIwcpbYhw3yjF1aVpCqjCM6Zg6/CI7Ra5jMhQFQSCHxAaPp3wJkSULKJxRhmFIJYnMhnI30i4mCvc1JqD+D25v39Rk61ISTNl0VQTEqoVNk43GhjrqnyXV1ctMtSi5YAYm+soZbrtK2UCAcuLIjlqfCJbDcmSi5auI8IDbAV8z4QyMG+ieeeMe2EkTf8whXQ7amILRaJUs8cxOIB2JGQNS23dA+85SpwwpmEJ90ZqNCKiqSGBFWMNVQ59SO5ZnT4QNvG19esplq4ZYCks9SaCZiFCipSRpXUtDLJZFBSThCcLgOAwckqlJSP3au0lRPzhbNdsyWSpQyLulLoSTQqAAJKFNxA5HlmT/VlapUAeFi+rOgqqyPdUMvUcqUvUb4ix/ClwItFCGxDKpqoJ9la6/aJagGYHgbQtYVK7ZdSQpKkpcliGmJQalQIrTTfKsUOz1egcVOHRKVGs5J11HrJLlCprXjJSS5z+0csACzKRyPgeCzP3mPsNkTmcFkkVUMThOOrrWf3S3BYChOmpOzAtiPtFgCCBmfswC2KrlKiK05NQTKSGdKQEuBrLSV5sn25S9zl4ubRmqPDxE1ThcBZp/tqUA0v7p1yPLTxyZuetjJdF5JzqS9TXiUARVSqYVJ1GvqYVThm40IIHCHYYkJA4gcjzimDiDg4hm6QSnhfjSOJSpydRr3Vi9Z7snr4gg5niLAk7pBfDLUKFLONBpGVgSbbYh6hvyopTEDEo4eI8JdQcBVerXMrglqzH0Yz1unYp0tiSkZUKWCS2EpUXKk9kqID02jar6OLwspIZqS6lAFCUq9+ocE1EYyYjDa3m4iAwJU2JSRTIMAWpTZ4xqJpQaR6X2NilPWQlL0d/saK7rD1xCGoQ6mAJZ8mP13wOvJJlLmIKlgBxVwSkBkv90pApkQ3KNFZLTIS60LwEvwkcDYgUgUcU5/KAl+2IcS0zUTOsUBw7zH3fY6vk+ceXC1W1n2c5QlKTzR+GvVfuR3ePtED3ZY/wCrUg0gQHu2s1Z2Deog1LEepqHykfBaRcSfzILTJpESLUQGgoJbxUm2BzlExaFbDShh1t1iwmTVxUHJvSI7xkqKwlIKiRQCseLjfI/IrA6c4sWWyLmFpaSTq3xOkFLHcITx2hYA90FvAq+A84PypmFOGVLCRzDeODPzaK/DvszjuJJdknqJCUrIGFyovQOSczEgmlR+zSz5rUGHgntK8WHOKpmJCqvMmDICpTsfdR30fnCqxKfGWHuoJ3dyuhOWQbM55xTFKjj7PKEXRarxtE2aMispMxdEpALBIAzYaCNbY+hlkklM21zTaFywG69f2aAKDBKJIA73ixfd/CyASZUrAG4SQ0urk4AO1XTR4wl4Wtc6Z1q6rbDjUA+EEkJSkUAck65w2MCjU6yWVKPUV0jS9Jb4RPmJ6uiUgpCjTF3DYN6wGM9I+8edB5DP6pA8b12c/OHIPJ++GpUee2WlWgnXu0A8NIo3ldyJpSo0WgulSTUMXbmIsJESy5RMaOA+bxcK+BWQWMlNk5+EWLHMUD1cyitDor+8XxZQeEjFoUpD+ZyH58ouSbGJSR1ighINA7qb+fMeDRtQbET1EY8LkriRWtDsKq8tPFouosZFVMgbliryyH1WB82/EIGGQj+owItNomTTxqJ5aR24R+ZhRy5O+EF7df8AZ5PZeYvfPLnAK3dJJk1wFYAdAWPnDk2QHSJBdYOkcWZr0NPRxrtguXLq4Or56mhPMnXfWLEmzEM3c33fdpVnqNQcjF3/AEMaCHi6VDJSvN/zhi1EX2hb0c15ZC2edOTko050765q3ahGY1grZr9nJzroXT/eidw5I0fKBYs01Or+EOE2YM0+UbWTExTw6iPzNFJ6Rg9qUg83DAjRyK0yUx2pFyRe9kOcopzIBlh3bjoKhTaMCRuIyP60PaT6Q9MyWaO2Wu2XiI1sg+mKc8sfMv4N1KtFiU6gZPCkDEQAMKjkHzDndnghJskk9lCC7OyUl27LtQBso85CaghQcEkOBR6FgaAEZhqwuEjIZuk4VEFSfdUs8TDRjSOPD7M6tQvVHqEtCQKAN6dzjtGJPrKrchp4x5rKvaen98sFsLmrCuFQCn4g4Bqx76xckdKJ4YOhTlmI9oPUqBohQDOag5vC3hkNWogb1SQQcs67PuTV32jC9LLPLIAIcVmKdwAAaTSRU4SHwggqD7PFiZ0tUpBZDKLhJCsmotKUkdsVLNUawFtVqXMUlS1OpIBCgkOA9JqEF2BdlvsNqdhiads5PUL8pDKsAJLZkhRCSE4ixYhKXEqzLDEKJcHYGIDZwFYgolKMaiSAEuCUpliuLEhVCSA+FxzsqmgApYGvZJJQ6mUQtRI61CnJSQGST51JilLaW5JJGIlnISMKRQABgwjXgwu6O/f9QoOKm6fpbLdwo4VKbtH8q/EQbkiKdmlhKQkafnrF+SmJM0t0m0W6aDjjV9lhAhSI5MK8KHhO7EtLSpWSQAOZTT4QVl4gh0gBxiJNSpw7AabV8o8+N5rYoc0cjuJJPq/mI3KGElJmrDACodCWYMDUk+ddogeB45ux2KanBSRUXNKlnA5NQ4qQ+5LBGeVDTWLEmTgGKYvCGqymGma6HQZYfGAN49LUSyUS5bgAYVGiSauAjMtSuRfOM3br3mzqqUe86fypyHfU84dDH6jJT4o1N7dLJckYZKQ25BAPckcSu+kTXP0qlTwAXlr91bB/5Tke7OPPVEAk5k6mp84rzFvFSgqJnM9at9mROQUTE4kn05g6GPMbfZ+rmrlu+FRD7jQ+UWLB0jtEoYQvENAsYm7jnFJc1S1Fai6lEqJ5mNRi0YlJUcInkyychC2aQVGgf0Hn9d8W5ypMofarCj7qcvLU98NUPcnlnXUeTpEh6AFR+7kH3V8ni4uWiWHnLCc+BPxOZ8YCWnpCs0lDAMn1gfhUouoknnHd8Y9GfCyZPM6QbtHSBhhkICRu20C1qUsuokmHybLF+TZIXKbZRDDCHSKUqzxclWSL0qzRalyoxYwqSrJFqXZosoREiRHAIUyIkEmJRDhABD1AhirKNotR0AA9d3pOkVZtzpOkGmjmgAzS7lbIkd0QqsU1OSvONUUxGqWNo2skl0xcsUJdpGVK5ozS8d+tj2kkeEaVdmB0iBdgSdIYtRNCJaPE+uACFpPw5Nke+ODDLnTvoT3mDJu1O0OTd42hn3r5CXoPaX8AZKCQwoPnF6xWVshU6wUlWMbRaRJAhc9RKSpDsWjhB2+SpIkGLaENEoTCtE5WNhDDmhGgAzCCCETfEt5KDeDgakCL9unnDQuwYFRdg3s6AQGuuaxMs6uR3tX0r4RcWpuA6dnu935cu4x3PDfFTX6idPPwpvE/0KUxDHiqc3OZhi5sJaFRUKjoHhcUVyY5RhkKJZOj93xOUPVhQHWR3fOK4QvshyZkuI8iS5ZOQ+vjFgqlyw8wudAN4Fz7zUaIDDeIESiS5qecac4x8phYZz5mwjab7WrhljAnlnFOXJJLmpizIskEZFlhLk2VQxxh0U7PZIIyLJFiXKiwlMZNjZUgRYQiEEPBjgEiREgiIGHBUBwmBhwMQBUOCoAJsULiiDHChUAE2KFxRCDDhABKDCiGCHAwAPjmhHhXjh05o7DHPHAwAcUx2GFeEeABwh0MeFeAB0dCPCQAK8c8JHPABhrP/uI/mH5iCd5ad5/7Ijo6KMX4ciHU/ix/3qD5kR+wrvT+cJHRPi8yK8/4bLhy8PlGbvPtjx/OOjoryHn6bzIZJghIjo6JmemErPF1EdHQATpiQR0dHAHQ9MdHQAOEOjo6ABRCmOjoAEh6Y6OgAdDxCR0ADkw4QsdHAFMdCx0AHCOELHQAdCQsdABwhYSOgAcI6OjoAFjjCR0AH//Z" alt="Amenity Kit 2" class="slider-image">
+                        <img src="https://i.ebayimg.com/images/g/SUEAAOSw8bxm4IH8/s-l1600.jpg" alt="Amenity Kit 3" class="slider-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpH4DbUBW0ysp76l28F2Vq_O8NAv2ZNPmhJINX3yFYFmT2dIFEchA1_MSY62vQLStCAXY&usqp=CAU" alt="Amenity Kit 1" class="slider-image">
+           
+                    </div>
+                    <div class="slider-dots"></div>
+                </div>
+                <h2 class="product-name">Emirates First Class pouches</h2>
+                <p class="product-description">Emirates First Class pouches are luxurious travel kits crafted from premium materials, designed to enhance the inflight experience with an elegant assortment of skincare essentials and comfort items. These sophisticated pouches reflect Emirates' commitment to top-tier service and luxury for their first-class travelers.</p>
+                <div class="product-price">₹150</div>
+            </div>
+
+            <!-- Product Card 8 -->
+            <div class="product-card">
+                <div class="product-slider">
+                    <button class="slider-button prev-button">←</button>
+                    <button class="slider-button next-button">→</button>
+                    <div class="slider-container">
+                        <img src="https://amenitiesmagazine.com/wp-content/uploads/2022/12/1.SKYSUPPLY-supplies-new-Business-Class-amenity-kits-to-Swiss-International-Air-Lines-e1670336625235.jpg" alt="Swiss Knife 1" class="slider-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTabHN4ls_TrcLDxCQOcFFg-_FY0bMKCWNwq0ABV3i8Q6WmkiNobJEK6dXPBNhl2OM5mYI&usqp=CAU" alt="Swiss Knife 2" class="slider-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQA-Twv7Mc8Rk1xOejHwkgCljPXunlD5vLJPV7iff88HSARtBCxpqI3-L4sVDTn_mfJfSU&usqp=CAU" alt="Swiss Knife 3" class="slider-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNoaaHssVCAcJ6DfO6G-8SYRz4AESd7lwNCMzJuiRf5X7AOdL3NHFxlDiktYjnvTw_UyU&usqp=CAU" alt="Swiss Knife 1" class="slider-image">
+                  
+                    </div>
+                    <div class="slider-dots"></div>
+                </div>
+                <h2 class="product-name">victorinox pouches </h2>
+                <p class="product-description">Victorinox pouches are expertly crafted for durability and functionality, offering compact storage solutions ideal for travel and daily essentials. Known for Swiss precision, these pouches provide reliable organization with a sleek, practical design that embodies Victorinox's commitment to quality and versatility.</p>
+                <div class="product-price">₹150</div>
+            </div>
+
+            <!-- Product Card 9 -->
+            <div class="product-card">
+                <div class="product-slider">
+                    <button class="slider-button prev-button">←</button>
+                    <button class="slider-button next-button">→</button>
+                    <div class="slider-container">
+                                       <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4VFOjum7sDeKdMsqczqpFiTallF2Lhudi5_YOYxmSuM67aAle8_VrVh3Ggbadm-Z7U_A&usqp=CAU" alt="Lotion 2" class="slider-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5JeUyOKszlM0150mcx3wnteTherLj8TMJ8x8Or1lL3iwxnCbT-OMHqra1JJSjvKyio20&usqp=CAU" alt="Lotion 3" class="slider-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrMkuqjUmAnuW6MyJmbmfHXZ-oxrX4XR_o0sgcymcETZxNSeWtxP7OfIDgVof44zR3du4&usqp=CAU" alt="Lotion 3" class="slider-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1NXj7UrJnFJ4b3cy-tuyM2qJQRrl22dZtRA&s" alt="Lotion 2" class="slider-image">
+                   
+                    </div>
+                    <div class="slider-dots"></div>
+                </div>
+                <h2 class="product-name">British air london pouches </h2>
+                <p class="product-description">British Air London pouches are refined travel kits featuring a curated selection of skincare and comfort items, designed to elevate the inflight experience. With a nod to British elegance, these pouches blend style and practicality, making travel essentials easily accessible for passengers.</p>
+                <div class="product-price">₹180</div>
+            </div>
+
+           
+                
+            </div>
+        </div>
+
+        <div class="catalogue-button-container">
+            <a href="https://wa.me/c/919267968905" target="_blank" class="catalogue-button">
+                <span class="button-content">
+                    <i class="fab fa-whatsapp"></i>
+                    View Complete Catalogue on WhatsApp
+                </span>
+                <div class="button-glow"></div>
+            </a>
+            <p class="catalogue-note">Click to explore our full collection and place orders directly!</p>
+        </div>
+
+        <footer class="site-footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <p>📞 +91 9810433480</p>
+                    <p>📧 za93548151@gmail.com</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#products">Products</a></li>
+                        <li><a href="#about">About Us</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Milia-Mart. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Add this to your HTML -->
+    <div class="logo-corner">
+        <img src="https://files.oaiusercontent.com/file-28mNW9fHnP53aM4Fs83wC6wH?se=2024-11-10T19%3A49%3A08Z&sp=r&sv=2024-08-04&sr=b&rscc=max-age%3D604800%2C%20immutable%2C%20private&rscd=attachment%3B%20filename%3D504f4e36-700c-4a4c-9b99-0eea914efb39.webp&sig=O4bg1VD7HL2IZEQOHuuoUxiaBgscFBjCo66cOQENNRE%3D" alt="Milia-Mart Logo">
+    </div>
+</body>
+</html>
